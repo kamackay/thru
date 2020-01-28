@@ -26,7 +26,7 @@ func main() {
 			fmt.Println(text)
 			if file != nil {
 				_, _ = file.WriteString(text + "\n")
-				go file.Flush()
+				file.Flush()
 			}
 		}
 	} else {

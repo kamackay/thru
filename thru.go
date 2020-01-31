@@ -39,7 +39,7 @@ func main() {
 		for reader.Scan() {
 			text := reader.Text()
 			if timestamps {
-				text = timestamp() + text
+				text = timestamp() + " - " + text
 			}
 			fmt.Println(text)
 			if file != nil {

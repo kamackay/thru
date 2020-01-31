@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -34,7 +35,7 @@ func main() {
 		// Input is being piped in
 		args := os.Args[1:]
 		var file *bufio.Writer
-		if len(args) > 0 {
+		if len(args) > 0 && !strings.HasPrefix(args[0], "-") {
 			fileName := args[0]
 			f, _ := os.Create(fileName)
 			file = bufio.NewWriter(f)

@@ -17,7 +17,15 @@ func hasOption(args []string, option string) bool {
 }
 
 func timestamp() string {
-	return time.Now().UTC().Format(time.RFC3339)
+	now := time.Now().UTC()
+	return fmt.Sprintf("%04d-%02d-%02d %02d:%02d:%02d:%03d",
+		now.Year(),
+		now.Month(),
+		now.Day(),
+		now.Hour(),
+		now.Minute(),
+		now.Second(),
+		now.Nanosecond() / 1000000)
 }
 
 func main() {

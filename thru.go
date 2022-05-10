@@ -3,8 +3,9 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/alecthomas/kong"
+	"github.com/kamackay/thru/model"
 	"os"
-	"strings"
 	"time"
 )
 
@@ -26,24 +27,25 @@ func timestamp() string {
 		now.Hour(),
 		now.Minute(),
 		now.Second(),
-		now.Nanosecond() / 1000000)
+		now.Nanosecond()/1000000)
 }
 
 func main() {
+	var opts model.Opts
+	_ = kong.Parse(&opts)
+	fileName := opts.File
 	fi, _ := os.Stdin.Stat()
 	if (fi.Mode() & os.ModeCharDevice) == 0 {
 		// Input is being piped in
-		args := os.Args[1:]
 		var file *bufio.Writer
-		if len(args) > 0 && !strings.HasPrefix(args[0], "-") {
-			fileName := args[0]
+		if len(fileName) > 0 {
 			f, _ := os.Create(fileName)
 			file = bufio.NewWriter(f)
 			if file != nil {
 				defer file.Flush()
 			}
 		}
-		timestamps := hasOption(args, "-t")
+		timestamps := opts.Timestamps
 		reader := bufio.NewScanner(os.Stdin)
 		for reader.Scan() {
 			text := reader.Text()

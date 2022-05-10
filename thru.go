@@ -4,9 +4,11 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/alecthomas/kong"
+	"github.com/fatih/color"
 	"github.com/kamackay/thru/model"
 	"github.com/kamackay/thru/version"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -16,6 +18,7 @@ func timestamp() string {
 }
 
 func main() {
+	red := color.New(color.FgRed)
 	var opts model.Opts
 	_ = kong.Parse(&opts)
 	if opts.Version {
@@ -24,6 +27,7 @@ func main() {
 	}
 	fileName := opts.File
 	fi, _ := os.Stdin.Stat()
+	enableHighlight := len(opts.Highlight) > 0
 	if (fi.Mode() & os.ModeCharDevice) == 0 {
 		// Input is being piped in
 		var file *bufio.Writer
@@ -38,8 +42,11 @@ func main() {
 		reader := bufio.NewScanner(os.Stdin)
 		for reader.Scan() {
 			text := reader.Text()
+			if enableHighlight {
+				text = strings.ReplaceAll(text, opts.Highlight, red.Sprintf(opts.Highlight))
+			}
 			if timestamps {
-				text = timestamp() + " - " + text
+				text = fmt.Sprintf("%s - %s", timestamp(), text)
 			}
 			fmt.Println(text)
 			if file != nil {

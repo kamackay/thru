@@ -5,34 +5,23 @@ import (
 	"fmt"
 	"github.com/alecthomas/kong"
 	"github.com/kamackay/thru/model"
+	"github.com/kamackay/thru/version"
 	"os"
 	"time"
 )
 
-func hasOption(args []string, option string) bool {
-	for _, arg := range args {
-		if arg == option {
-			return true
-		}
-	}
-	return false
-}
-
 func timestamp() string {
 	now := time.Now().UTC()
-	return fmt.Sprintf("%04d-%02d-%02d %02d:%02d:%02d:%03d",
-		now.Year(),
-		now.Month(),
-		now.Day(),
-		now.Hour(),
-		now.Minute(),
-		now.Second(),
-		now.Nanosecond()/1000000)
+	return fmt.Sprintf(now.Format("2006-02-01 15:04:05.000"))
 }
 
 func main() {
 	var opts model.Opts
 	_ = kong.Parse(&opts)
+	if opts.Version {
+		fmt.Printf("%s\n", version.VERSION)
+		return
+	}
 	fileName := opts.File
 	fi, _ := os.Stdin.Stat()
 	if (fi.Mode() & os.ModeCharDevice) == 0 {

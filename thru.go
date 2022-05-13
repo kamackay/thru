@@ -8,6 +8,7 @@ import (
 	"github.com/kamackay/thru/model"
 	"github.com/kamackay/thru/version"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -19,6 +20,7 @@ func timestamp() string {
 
 func main() {
 	red := color.New(color.FgRed)
+	blue := color.New(color.FgBlue)
 	var opts model.Opts
 	_ = kong.Parse(&opts)
 	if opts.Version {
@@ -27,7 +29,19 @@ func main() {
 	}
 	fileName := opts.File
 	fi, _ := os.Stdin.Stat()
-	enableHighlight := len(opts.Highlight) > 0
+
+	var (
+		enableHighlight                = len(opts.Highlight) > 0
+		re              *regexp.Regexp = nil
+		err             error
+		highlightRegex  = true
+	)
+	if enableHighlight {
+		re, err = regexp.Compile(opts.Highlight)
+		if err != nil {
+			highlightRegex = true
+		}
+	}
 	if (fi.Mode() & os.ModeCharDevice) == 0 {
 		// Input is being piped in
 		var file *bufio.Writer
@@ -43,7 +57,13 @@ func main() {
 		for reader.Scan() {
 			text := reader.Text()
 			if enableHighlight {
-				text = strings.ReplaceAll(text, opts.Highlight, red.Sprintf(opts.Highlight))
+				if highlightRegex {
+					text = re.ReplaceAllStringFunc(text, func(s string) string {
+						return blue.Sprintf(s)
+					})
+				} else {
+					text = strings.ReplaceAll(text, opts.Highlight, red.Sprintf(opts.Highlight))
+				}
 			}
 			if timestamps {
 				text = fmt.Sprintf("%s - %s", timestamp(), text)

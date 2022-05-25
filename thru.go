@@ -20,7 +20,7 @@ func timestamp() string {
 
 func main() {
 	red := color.New(color.FgRed)
-	blue := color.New(color.FgBlue)
+	yellow := color.New(color.FgYellow)
 	var opts model.Opts
 	_ = kong.Parse(&opts)
 	if opts.Version {
@@ -59,7 +59,7 @@ func main() {
 			if enableHighlight {
 				if highlightRegex {
 					text = re.ReplaceAllStringFunc(text, func(s string) string {
-						return blue.Sprintf(s)
+						return yellow.Sprintf(s)
 					})
 				} else {
 					text = strings.ReplaceAll(text, opts.Highlight, red.Sprintf(opts.Highlight))
